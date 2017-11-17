@@ -14,7 +14,10 @@ app.use(bodyParser.json())
 app.use(morgan('dev'))
 
 mongodb.MongoClient.connect(url, (error, db) => {
-  if (error) return process.exit(1) 
+  if (error) {
+    console.log("Can not find instance of mongodb.  Please make you've started your instance of mongod")
+    return process.exit(1) 
+  }
   console.log('connected to mongodb: ' + url)
 
   app.get('/messages', (req, res, next) => {

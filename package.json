@@ -1,13 +1,12 @@
 {
   "name": "express-create-react-app-example",
   "version": "1.0.0",
-  "description": "How to use create-react-app with a custom Node API on Heroku",
+  "description": "How to use create-react-app with a custom Node API",
   "engines": {
     "node": "6.11.x"
   },
   "scripts": {
-    "start": "nodemon server/server.js",
-    "heroku-postbuild": "cd react-ui/ && npm install --only=dev && npm install && npm run build"
+    "start": "nodemon server/server.js"
   },
   "cacheDirectories": [
     "node_modules",
@@ -27,7 +26,6 @@
   },
   "keywords": [
     "node",
-    "heroku",
     "create-react-app",
     "react"
   ],
