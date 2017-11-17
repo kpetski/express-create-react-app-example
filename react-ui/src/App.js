@@ -36,9 +36,9 @@ class App extends Component {
     console.log(this.state)
     return (
       <div className="App">
-        
+        <h1 className="padding-small margin-bottom-tiny text-white bg-primary">Quotes</h1><br/>
       {this.state.data.map((message, index) => {
-         return <p key={index}>{message.text}</p>
+         return <p key={index}>{`"${message.text}" ~ ${message.name}`}</p>
       })}
       </div>
     );
