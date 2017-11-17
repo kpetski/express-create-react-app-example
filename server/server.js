@@ -1,23 +1,68 @@
-const express = require('express');
-const path = require('path');
+const express = require('express')
+const app = express()
+const bodyParser = require('body-parser')
+const morgan = require('morgan')
+const errorhandler = require('errorhandler')
+app.set('port', process.env.PORT || 5000)
+const path = require('path')
+const mongodb= require('mongodb')
+const url = 'mongodb://localhost:27017/nwm'
 
-const app = express();
-const PORT = process.env.PORT || 5000;
+app.use(express.static(path.join(__dirname, '../react-ui/build')))
 
-// Priority serve any static files.
-app.use(express.static(path.resolve(__dirname, '../react-ui/build')));
+app.use(bodyParser.json())
+app.use(morgan('dev'))
 
-// Answer API requests.
-app.get('/api', function (req, res) {
-  res.set('Content-Type', 'application/json');
-  res.send('{"message":"Hello from the custom server!"}');
-});
+mongodb.MongoClient.connect(url, (error, db) => {
+  if (error) return process.exit(1) 
+  console.log('connected to mongodb: ' + url)
 
-// All remaining requests return the React app, so it can handle routing.
-app.get('*', function(request, response) {
-  response.sendFile(path.resolve(__dirname, '../react-ui/build', 'index.html'));
-});
+  app.get('/messages', (req, res, next) => {
+    db.collection('messages')
+      .find({})
+      .toArray((error, messages) => {
+        if(error) return next(error)
+        res.send(messages)
+      })
+  })
 
-app.listen(PORT, function () {
-  console.log(`Listening on port ${PORT}`);
-});
+  app.get('/messages/:id', (req, res, next) => {
+    db.collection('messages')
+      .find({_id: mongodb.ObjectID(req.params.id)})
+      .toArray((error, messages) => {
+        if(error) return next(error)
+        res.send(messages)
+      })
+  })
+
+  app.post('/messages', (req, res, next) => {
+    let newMessage = req.body
+    db.collection('messages').insert(newMessage, (error, results) => {
+      if(error) return next(error)
+      res.send(results)
+    })
+  })
+
+  app.put('/messages/:id', (req, res, next) => {
+    db.collection('messages')
+      .update({_id: mongodb.ObjectID(req.params.id)}, {$set: req.body}, (error, results) => {
+        if(error) return next(error)
+        res.send(results)
+      })
+  })
+
+  app.delete('/messages/:id', (req, res, next) => {
+    db.collection('messages')
+      .remove({_id:mongodb.ObjectID(req.params.id)}, (error, results) => {
+        if(error) return next (error)
+        res.send(results)
+      })
+  })
+  
+
+})
+
+app.use(errorhandler())
+app.listen(app.get('port'), ()=>{
+  console.log(`server is running on port ${app.get('port')}`)
+})

@@ -6,13 +6,13 @@ class App extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      message: null,
+      data: [],
       fetching: true
     }
   }
 
   componentDidMount() {
-    fetch('/api')
+    fetch('/messages')
       .then(response => {
         if (!response.ok) {
           throw new Error(`status ${response.status}`);
@@ -21,29 +21,25 @@ class App extends Component {
       })
       .then(json => {
         this.setState({
-          message: json.message,
+          data: json,
           fetching: false
         });
       }).catch(e => {
         this.setState({
-          message: `API call failed: ${e}`,
+          data: `API call failed: ${e}`,
           fetching: false
         });
       })
   }
 
   render() {
+    console.log(this.state)
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-      <p className="App-intro">
-        {this.state.fetching
-          ? 'Fetching message from API'
-          : this.state.message}
-      </p>
+        
+      {this.state.data.map((message, index) => {
+         return <p key={index}>{message.text}</p>
+      })}
       </div>
     );
   }
