@@ -1,0 +1,6 @@
+#we don't want to put all our node dependencies usner source control
+node_modules
+npm-debug.log
+#this file might get auto-created on macOS and we don't need it
+.DS_Store
+react-ui/build
